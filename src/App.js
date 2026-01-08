@@ -94,9 +94,7 @@ function App() {
 
     setWatchUrl(url);
 
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // ================= EFFECTS =================
@@ -161,20 +159,17 @@ function App() {
         </form>
       </div>
 
-      {/* WATCH PLAYER – SECURED */}
+      {/* WATCH PLAYER */}
       {watchUrl && (
         <div className="pt-24 px-4">
-          <div className="w-full aspect-video bg-black overflow-hidden rounded-xl shadow-lg">
+          <div className="w-full aspect-video bg-black">
             <iframe
               src={watchUrl}
-              width="100%"
-              height="500"
+              className="w-full h-full"
               frameBorder="0"
               allowFullScreen
-              sandbox="allow-scripts allow-same-origin allow-presentation"
-              referrerPolicy="no-referrer"
               title="Watch"
-            />
+            ></iframe>
           </div>
         </div>
       )}
