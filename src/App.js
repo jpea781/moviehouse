@@ -161,17 +161,20 @@ function App() {
         </form>
       </div>
 
-      {/* WATCH PLAYER */}
+      {/* WATCH PLAYER – SECURED */}
       {watchUrl && (
-        <div className="pt-20 px-4">
-          <div className="w-full aspect-video bg-black">
+        <div className="pt-24 px-4">
+          <div className="w-full aspect-video bg-black overflow-hidden rounded-xl shadow-lg">
             <iframe
               src={watchUrl}
-              className="w-full h-full"
+              width="100%"
+              height="500"
               frameBorder="0"
               allowFullScreen
+              sandbox="allow-scripts allow-same-origin allow-presentation"
+              referrerPolicy="no-referrer"
               title="Watch"
-            ></iframe>
+            />
           </div>
         </div>
       )}

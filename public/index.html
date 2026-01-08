@@ -1,6 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+  <style>
+/* Kill common ad overlays */
+iframe[src*="ads"],
+iframe[src*="doubleclick"],
+iframe[src*="pop"],
+div[id*="ad"],
+div[class*="ad"],
+div[class*="popup"],
+div[class*="overlay"],
+div[class*="banner"],
+div[class*="sponsor"] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  pointer-events: none !important;
+}
+</style>
+
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
