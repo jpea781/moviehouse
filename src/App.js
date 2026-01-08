@@ -13,75 +13,93 @@ function App() {
   const [trailerKey, setTrailerKey] = useState(null);
   const [watchUrl, setWatchUrl] = useState(null);
 
-  // ================= FETCH TRENDING =================
+  // ================= FETCH FUNCTIONS =================
+
   const fetchTrending = async () => {
-    const res = await fetch(
-      `https://api.themoviedb.org/3/trending/${type}/week?api_key=${API_KEY}`
-    );
-    const data = await res.json();
-    setMovies(data.results || []);
-    setFeatured(data.results?.[0] || null);
-  };
-
-  // ================= CATEGORY =================
-  const fetchByCategory = async (cat) => {
-    let endpoint = "";
-
-    if (type === "movie") {
-      endpoint = `https://api.themoviedb.org/3/movie/${cat}?api_key=${API_KEY}`;
-    } else {
-      if (cat === "upcoming") {
-        endpoint = `https://api.themoviedb.org/3/tv/on_the_air?api_key=${API_KEY}`;
-      } else {
-        endpoint = `https://api.themoviedb.org/3/tv/${cat}?api_key=${API_KEY}`;
-      }
+    try {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/trending/${type}/week?api_key=${API_KEY}`
+      );
+      const data = await res.json();
+      setMovies(data.results || []);
+      setFeatured(data.results?.[0] || null);
+    } catch (err) {
+      console.error("Trending fetch failed:", err);
     }
-
-    const res = await fetch(endpoint);
-    const data = await res.json();
-    setMovies(data.results || []);
-    setFeatured(data.results?.[0] || null);
   };
 
-  // ================= SEARCH =================
+  const fetchByCategory = async (cat) => {
+    try {
+      let endpoint = "";
+
+      if (type === "movie") {
+        endpoint = `https://api.themoviedb.org/3/movie/${cat}?api_key=${API_KEY}`;
+      } else {
+        endpoint =
+          cat === "upcoming"
+            ? `https://api.themoviedb.org/3/tv/on_the_air?api_key=${API_KEY}`
+            : `https://api.themoviedb.org/3/tv/${cat}?api_key=${API_KEY}`;
+      }
+
+      const res = await fetch(endpoint);
+      const data = await res.json();
+      setMovies(data.results || []);
+      setFeatured(data.results?.[0] || null);
+    } catch (err) {
+      console.error("Category fetch failed:", err);
+    }
+  };
+
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!search.trim()) return;
 
-    const res = await fetch(
-      `https://api.themoviedb.org/3/search/${type}?api_key=${API_KEY}&query=${search}`
-    );
-    const data = await res.json();
-    setMovies(data.results || []);
-    setFeatured(data.results?.[0] || null);
+    try {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/search/${type}?api_key=${API_KEY}&query=${search}`
+      );
+      const data = await res.json();
+      setMovies(data.results || []);
+      setFeatured(data.results?.[0] || null);
+    } catch (err) {
+      console.error("Search failed:", err);
+    }
   };
 
-  // ================= TRAILER =================
   const fetchTrailer = async (item) => {
     if (!item) return;
-    const res = await fetch(
-      `https://api.themoviedb.org/3/${type}/${item.id}/videos?api_key=${API_KEY}`
-    );
-    const data = await res.json();
-    const trailer = data.results?.find(
-      (vid) => vid.type === "Trailer" && vid.site === "YouTube"
-    );
-    setTrailerKey(trailer?.key || null);
+    try {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/${type}/${item.id}/videos?api_key=${API_KEY}`
+      );
+      const data = await res.json();
+      const trailer = data.results?.find(
+        (vid) => vid.type === "Trailer" && vid.site === "YouTube"
+      );
+      setTrailerKey(trailer?.key || null);
+    } catch (err) {
+      console.error("Trailer fetch failed:", err);
+    }
   };
 
-  // ================= WATCH LINK (THIRD PARTY) =================
+  // ================= ACTIONS =================
+
   const startWatching = (item) => {
     if (!item) return;
-    const id = item.id;
 
-    // SAME TAB embed player
-    const url = type === "movie"
-      ? `https://vidsrc.to/embed/movie/${id}`
-      : `https://vidsrc.to/embed/tv/${id}`;
+    const url =
+      type === "movie"
+        ? `https://vidsrc.to/embed/movie/${item.id}`
+        : `https://vidsrc.to/embed/tv/${item.id}`;
 
     setWatchUrl(url);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
+
+  // ================= EFFECTS =================
 
   useEffect(() => {
     if (category === "trending") {
@@ -95,13 +113,13 @@ function App() {
     fetchTrailer(featured);
   }, [featured]);
 
+  // ================= UI =================
+
   return (
     <div className="bg-black text-white min-h-screen">
 
-      {/* ================= NAVBAR ================= */}
+      {/* NAVBAR */}
       <div className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md px-8 py-4 flex items-center justify-between">
-
-        {/* LOGO */}
         <h1
           onClick={() => {
             setSearch("");
@@ -115,7 +133,6 @@ function App() {
           <span className="text-red-600">House</span>
         </h1>
 
-        {/* NAV LINKS */}
         <div className="hidden md:flex gap-10 text-lg font-semibold">
           <button onClick={() => { setCategory("trending"); setWatchUrl(null); fetchTrending(); }} className="hover:text-red-500">Home</button>
           <button onClick={() => { setCategory("popular"); setWatchUrl(null); fetchByCategory("popular"); }} className="hover:text-red-500">Popular</button>
@@ -133,7 +150,6 @@ function App() {
           </button>
         </div>
 
-        {/* SEARCH */}
         <form onSubmit={handleSearch}>
           <input
             type="text"
@@ -145,7 +161,7 @@ function App() {
         </form>
       </div>
 
-      {/* ================= WATCH PLAYER ================= */}
+      {/* WATCH PLAYER */}
       {watchUrl && (
         <div className="pt-20 px-4">
           <div className="w-full aspect-video bg-black">
@@ -160,22 +176,26 @@ function App() {
         </div>
       )}
 
-      {/* ================= HERO ================= */}
+      {/* HERO */}
       {!watchUrl && featured && (
         <div className="relative h-[85vh] pt-20 flex items-end px-10 pb-20">
 
           {trailerKey ? (
             <iframe
               className="absolute inset-0 w-full h-full object-cover opacity-40"
-              src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailerKey}`}
+              src={`https://www.youtube.com/embed/${trailerKey}?mute=1&controls=0&loop=1&playlist=${trailerKey}`}
               title="Trailer"
               frameBorder="0"
-              allow="autoplay; fullscreen"
+              allow="fullscreen"
             />
           ) : (
             <div
               className="absolute inset-0 bg-cover bg-center opacity-40"
-              style={{ backgroundImage: `url(${IMG}${featured.backdrop_path})` }}
+              style={{
+                backgroundImage: featured.backdrop_path
+                  ? `url(${IMG}${featured.backdrop_path})`
+                  : "none"
+              }}
             />
           )}
 
@@ -204,7 +224,7 @@ function App() {
         </div>
       )}
 
-      {/* ================= GRID ================= */}
+      {/* GRID */}
       {!watchUrl && (
         <div className="px-8 py-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
           {movies.map((movie) => (
@@ -214,7 +234,11 @@ function App() {
             >
               <img
                 onClick={() => startWatching(movie)}
-                src={`${IMG}${movie.poster_path}`}
+                src={
+                  movie.poster_path
+                    ? `${IMG}${movie.poster_path}`
+                    : "https://via.placeholder.com/300x450?text=No+Image"
+                }
                 alt={movie.title || movie.name}
                 className="rounded-lg h-[300px] object-cover w-full"
               />
@@ -226,7 +250,7 @@ function App() {
         </div>
       )}
 
-      {/* ================= MODAL ================= */}
+      {/* MODAL */}
       {selectedMovie && (
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 rounded-lg max-w-4xl w-full p-6 relative">
@@ -240,7 +264,11 @@ function App() {
 
             <div className="flex flex-col md:flex-row gap-6">
               <img
-                src={`${IMG}${selectedMovie.poster_path}`}
+                src={
+                  selectedMovie.poster_path
+                    ? `${IMG}${selectedMovie.poster_path}`
+                    : "https://via.placeholder.com/300x450?text=No+Image"
+                }
                 alt={selectedMovie.title || selectedMovie.name}
                 className="w-full md:w-1/3 rounded"
               />
