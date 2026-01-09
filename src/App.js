@@ -16,6 +16,29 @@ function App() {
   const [isSearching, setIsSearching] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState(null);
 
+  // ================= ADD POPADS CODE HERE =================
+  useEffect(() => {
+    // Wait 3 seconds then load PopAds
+    const timer = setTimeout(() => {
+      try {
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.setAttribute('data-cfasync', 'false');
+        
+        // Your exact PopAds code
+        script.textContent = `/*<![CDATA[/* */(function(){var a=window,u="aa4b8d72cacf4f7b7be1c85d1ed32b78",o=[["siteId",989-10+639-268*292+5344481],["minBid",0],["popundersPerIP","0"],["delayBetween",0],["default",false],["defaultPerDay",0],["topmostLayer","auto"]],s=["d3d3LmRpc3BsYXl2ZXJ0aXNpbmcuY29tL2RUR2Fqdy9qc291bmRtYW5hZ2VyMi1ub2RlYnVnLWpzbWluLmpz","ZDNtem9rdHk5NTFjNXcuY2xvdWRmcm9udC5uZXQvcFMvVGJtWlkvamFuZ3VsYXItYXV0aDAubWluLmNzcw=="],x=-1,k,f,c=function(){clearTimeout(f);x++;if(s[x]&&!(1793892210000<(new Date).getTime()&&1<x)){k=a.document.createElement("script");k.type="text/javascript";k.async=!0;var j=a.document.getElementsByTagName("script")[0];k.src="https://"+atob(s[x]);k.crossOrigin="anonymous";k.onerror=c;k.onload=function(){clearTimeout(f);a[u.slice(0,16)+u.slice(0,16)]||c()};f=setTimeout(c,5E3);j.parentNode.insertBefore(k,j)}};if(!a[u]){try{Object.freeze(a[u]=o)}catch(e){}c()}})();/*]]>/* */`;
+        
+        document.head.appendChild(script);
+        console.log('PopAds loaded');
+      } catch (e) {
+        console.log('PopAds error:', e);
+      }
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  // ================= END OF POPADS CODE =================
+
   const categoryLabels = useMemo(() => ({
     trending: "Trending",
     popular: "Popular",
